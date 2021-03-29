@@ -314,15 +314,15 @@ int altura(ABin a) {
 }
 
 ABin cloneAB(ABin a) {
-    if(a == NULL) return NULL;
+    if (a == NULL) return NULL;
     ABin new = malloc(sizeof(struct nodo));
     new->valor = a->valor;
     new->dir = cloneAB(a->dir);
     new->esq = cloneAB(a->esq);
     return new;
 }
-void mirror (ABin *a) {
-    if(*a == NULL) return;
+void mirror(ABin *a) {
+    if (*a == NULL) return;
     ABin tmp = (*a)->esq;
     (*a)->esq = (*a)->dir;
     (*a)->dir = tmp;
@@ -330,6 +330,5 @@ void mirror (ABin *a) {
     mirror(&((*a)->esq));
 }
 
-void inorder (ABin a, LInt *l) {
-    
+void inorder(ABin a, LInt *l) {
 }

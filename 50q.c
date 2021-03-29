@@ -92,8 +92,9 @@ int mystrcmp(char s1[], char s2[]) {
 char *mystrstr(char s1[], char s2[]) {
     int i, j;
     if (!*s2) return s1;
-    for (i = 0; s1[i]; i++){
-        for (j = 0; s1[i + j] && s2[j] && s1[i + j] == s2[j]; j++);
+    for (i = 0; s1[i]; i++) {
+        for (j = 0; s1[i + j] && s2[j] && s1[i + j] == s2[j]; j++)
+            ;
         if (!s2[j]) return s1 + i;
     }
     return NULL;
