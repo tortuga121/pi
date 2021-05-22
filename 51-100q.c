@@ -1,3 +1,4 @@
+#include <stdlib.h>
 typedef struct lligada {
     int valor;
     struct lligada *prox;
@@ -40,7 +41,7 @@ void insertOrd(LInt *l, int x) {
 }
 
 int removeOneOrd(LInt *l, int x) {
-    while (*l && (*l)->valor < x) l = &((*l)->prox);
+    while (*l && (*l)->valor != x) l = &((*l)->prox);
     if (*l)
         *l = (*l)->prox;
     else
@@ -76,21 +77,22 @@ void splitQS(LInt l, int x, LInt *mx, LInt *Mx) {
     (*Mx) = NULL;
 }
 
-LInt parteAmeio(LLig *l) {
-    int len = 0;
-    LInt pt, y, ant;
-    pt = y = ant = *l;
-    while (pt) {
-        len++;
-        pt = pt->prox
-    }
-    int meio = len / 2;
-    while (meio) {
-        ant = *l;
-        l = &((*l)->prox);
-        meio--;
-    }
-    ant->prox = NULL return y;
+LInt parteAmeio(LInt *l) {
+    int tam = 0;
+    LInt a;
+    for (a = *l; a; a = a->prox, tam++)
+        ;
+    tam /= 2;
+    if (tam == 0) return NULL;
+    LInt inicio = *l;
+
+    LInt *pt;
+    for (pt = l; *pt && tam; pt = &((*pt)->prox), tam--)
+        ;
+
+    *l = *pt;
+    *pt = NULL;
+    return inicio;
 }
 
 int removeAll(LInt *l, int x) {
@@ -113,7 +115,7 @@ int removeDups(LInt *l) {
             if ((*pt)->valor == x)
                 *pt = (*pt)->prox;
             else
-                pt = &((*pt)->pt);
+                pt = &((*pt)->prox);
         l = &((*l)->prox);
     }
 }
@@ -331,4 +333,59 @@ void mirror(ABin *a) {
 }
 
 void inorder(ABin a, LInt *l) {
+    if (!a) return;
+    inorder(a->dir, l);
+    LInt new = malloc(sizeof(struct lligada));
+    new->valor = a->valor;
+    new->prox = *l;
+    *l = new;
+    inorder(a->esq, l);
+}
+
+void preorder(ABin a, LInt *l) {
+    *l = NULL;
+    preorderaux(a, l);
+}
+void preorder_aux(ABin a, LInt *l) {
+    if (a) {
+        preorder_aux(a->dir, l);
+        preorder_aux(a->esq, l);
+        LInt nodo = malloc(sizeof(struct lligada));
+        nodo->valor = a->valor;
+        nodo->prox = *l;
+        *l = nodo;
+    }
+}
+
+void posorder(ABin a, LInt *l) {
+    *l = NULL;
+    posorder_aux(a, l);
+}
+
+void posorder_aux(ABin a, LInt *l) {
+    if (a) {
+        LInt nodo = malloc(sizeof(struct lligada));
+        nodo->valor = a->valor;
+        nodo->prox = *l;
+        *l = nodo;
+        posorder_aux(a->dir, l);
+        posorder_aux(a->esq, l);
+    }
+}
+
+int depth(ABin a, int x) {
+    if (!a) return -1;
+    if (a->valor == x) return 1;
+    int esq = 1 + depth(a->esq, x);
+    int dir = 1 + depth(a->dir, x);
+    if (esq && dir) return esq > dir ? dir : esq;
+    if(esq) return esq;
+    if(dir) return dir;
+    return -1;
+}
+int freeAB (ABin a) {
+    if(!a) return 0;
+    int r = freeAB(a->dir) + freeAB(a->esq);
+    free(a);
+    return 1+r;
 }

@@ -256,7 +256,7 @@ int contaVogais(char s[]) {
 int contida(char a[], char b[]) {
     int i, j;
     int contida = 1;
-    for (i = 0 : a[i] && contida; i++) {
+    for (i = 0 ; a[i] && contida; i++) {
         for (j = 0; b[j] && a[i] != b[j]; j++)
             ;
         contida = a[i] == b[j];
@@ -332,7 +332,8 @@ void insere(int v[], int N, int x) {
 }
 
 void merge(int r[], int a[], int b[], int na, int nb) {
-    int i, j, k : i = j = k = 0;
+    int i, j, k;
+    i = j = k = 0;
     while (i < na + nb)
         r[i++] = ((b[k] < a[j] && k < nb) || j >= na) ? b[k++] : a[j++];
 }
@@ -348,7 +349,7 @@ int retiraNeg(int v[], int N) {
     int i = 0;
     int k;
     while (i < N) {
-        if (a[i] < 0) {
+        if (v[i] < 0) {
             for (k = i; k < N; k++)
                 v[k] = v[k + 1];
             N--;
