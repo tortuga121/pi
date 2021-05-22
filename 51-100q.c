@@ -152,7 +152,7 @@ void concatL(LInt *a, LInt b) {
 
 LInt cloneL(LInt l) {
     if (!l) return NULL;
-    return newLInt(l->valor,cloneL(l->prox));
+    return newLInt(l->valor, cloneL(l->prox));
 }
 
 LInt cloneRev(LInt l) {
@@ -403,19 +403,26 @@ int iguaisAB(ABin a, ABin b) {
     if (!(a && b)) return 0;
     return a->valor == b->valor && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
 }
+
 LInt nivelL(ABin a, int n) {
-    if (n > 0) {
-        nivelL(a->dir,n-1);
-        nivelL(a->esq,n-1);
-        return NULL;
+    if (n < 1 || a == NULL) return NULL;
+
+    if (n == 1) {
+        return newLInt(a->valor, NULL);
     }
+    LInt esq = nivelL(a->esq, n - 1);
+    LInt dir = nivelL(a->dir, n - 1);
+    concatL(&esq, dir);
+    return esq;
+}
 
-    if(n < 0) return NULL;
-    
-    LInt new = malloc(sizeof(struct lligada));
-    new->valor = a->valor;
-    new->prox = NULL;
-    return new;
-
-   
+int nivelV(ABin a, int n, int v[]) {
+    if (n < 1 || a == NULL) return 0;
+    if (n == 1) {
+        *v = a->valor;
+        return 1;
+    }
+    int offset = nivelV(a->esq, n - 1, v);
+    offset += nivelV(a->dir, n - 1, v + offset);
+    return offset;
 }
