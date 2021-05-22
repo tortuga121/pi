@@ -152,10 +152,7 @@ void concatL(LInt *a, LInt b) {
 
 LInt cloneL(LInt l) {
     if (!l) return NULL;
-    LInt new = malloc(sizeof(struct lligada));
-    new->valor = l->valor;
-    new->prox = cloneL(l->prox);
-    return new;
+    return newLInt(l->valor,cloneL(l->prox));
 }
 
 LInt cloneRev(LInt l) {
@@ -379,13 +376,46 @@ int depth(ABin a, int x) {
     int esq = 1 + depth(a->esq, x);
     int dir = 1 + depth(a->dir, x);
     if (esq && dir) return esq > dir ? dir : esq;
-    if(esq) return esq;
-    if(dir) return dir;
+    if (esq) return esq;
+    if (dir) return dir;
     return -1;
 }
-int freeAB (ABin a) {
-    if(!a) return 0;
+int freeAB(ABin a) {
+    if (!a) return 0;
     int r = freeAB(a->dir) + freeAB(a->esq);
     free(a);
-    return 1+r;
+    return 1 + r;
+}
+
+int pruneAB(ABin *a, int l) {
+    if (!*a) return 0;
+    if (l > 0)
+        return pruneAB(&((*a)->esq), l - 1) + pruneAB(&((*a)->dir), l - 1);
+
+    ABin esq = (*a)->esq;
+    ABin dir = (*a)->dir;
+    free(*a);
+    *a = NULL;
+    return 1 + pruneAB(&esq, 0) + pruneAB(&dir, 0);
+}
+int iguaisAB(ABin a, ABin b) {
+    if (!(a || b)) return 1;
+    if (!(a && b)) return 0;
+    return a->valor == b->valor && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
+}
+LInt nivelL(ABin a, int n) {
+    if (n > 0) {
+        nivelL(a->dir,n-1);
+        nivelL(a->esq,n-1);
+        return NULL;
+    }
+
+    if(n < 0) return NULL;
+    
+    LInt new = malloc(sizeof(struct lligada));
+    new->valor = a->valor;
+    new->prox = NULL;
+    return new;
+
+   
 }
