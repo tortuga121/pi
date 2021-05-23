@@ -394,6 +394,7 @@ int pruneAB(ABin *a, int l) {
 
     ABin esq = (*a)->esq;
     ABin dir = (*a)->dir;
+
     free(*a);
     *a = NULL;
     return 1 + pruneAB(&esq, 0) + pruneAB(&dir, 0);
@@ -425,4 +426,150 @@ int nivelV(ABin a, int n, int v[]) {
     int offset = nivelV(a->esq, n - 1, v);
     offset += nivelV(a->dir, n - 1, v + offset);
     return offset;
+}
+
+int dumpAbin(ABin a, int v[], int N) {
+    if (a == NULL) return 0;
+
+    int offset = dumpAbin(a->esq, v, N);
+
+    if (offset >= N) return offset;
+    *v = a->valor;
+    offset++;
+
+    offset += dumpAbin(a->dir, v + offset, N - offset);
+    return offset;
+}
+
+int calcula_soma(ABin a) {
+    if (a == NULL) return 0;
+    return a->valor + calcula_soma(a->dir) + calcula_soma(a->esq);
+}
+ABin somasAcA(ABin a) {
+    if (a == NULL) return NULL;
+    ABin new = malloc(sizeof(struct nodo));
+    new->dir = somasAcA(a->dir);
+    new->esq = somasAcA(a->esq);
+    new->valor = a->valor + calcula_soma(a->dir) + calcula_soma(a->esq);
+    return new;
+}
+
+int contaFolhas(ABin a) {
+    if (a == NULL) return 0;
+    if (a->dir == NULL && a->esq == NULL) return 1;
+    return contaFolhas(a->dir) + contaFolhas(a->esq);
+}
+ABin cloneMirror(ABin a) {
+    if (a == NULL) return NULL;
+    ABin new = malloc(sizeof(struct nodo));
+    new->valor = a->valor;
+    new->esq = cloneMirror(a->dir);
+    new->dir = cloneMirror(a->esq);
+    return new;
+}
+
+int addOrd(ABin *a, int x) {
+    while (*a && (*a)->valor != x)
+        a = (*a)->valor < x ? &((*a)->dir) : &((*a)->esq);
+    if (*a && (*a)->valor == x) return 1;
+    ABin new = malloc(sizeof(struct nodo));
+    new->valor = x;
+    new->esq = NULL;
+    new->dir = NULL;
+    *a = new;
+    return 0;
+}
+// versao recursiva
+int addOrdRec(ABin *a, int x) {
+    if (*a == NULL) {
+        ABin nodo = malloc(sizeof(struct nodo));
+        nodo->valor = x;
+        nodo->dir = NULL;
+        nodo->esq = NULL;
+        *a = nodo;
+        return 0;
+    }
+    if ((*a)->valor == x) return 1;
+    addOrdRec(((*a)->valor > x ? &(*a)->esq : &(*a)->dir), x);
+}
+
+int lookupAB(ABin a, int x) {
+    while (a && a->valor != x)
+        a = a->valor < x ? a->dir : a->esq;
+    return a && a->valor == x;
+}
+//versao recursiva
+int lookupABRec(ABin a, int x) {
+    if (a == NULL) return 0;
+    if (a->valor == x) return 1;
+    return lookupABRec(a->valor > x ? a->esq : a->dir, x);
+}
+
+int depthOrd(ABin a, int x) {
+    int nivel = 1;
+    while (a && a->valor != x) {
+        a = a->valor < x ? a->dir : a->esq;
+        nivel++;
+    }
+    if (a && a->valor == x)
+        return nivel;
+    else
+        return -1;
+}
+//versao recursiva
+int depthOrdRec(ABin a, int x) {
+    if (a == NULL) return -1;
+    if (a->valor == x) return 1;
+    int nivel = depthOrdRec(a->valor > x ? a->esq : a->dir, x);
+    return nivel == -1 ? -1 : nivel + 1;
+}
+
+int maiorAB(ABin a) {
+    for (; a->dir; a = a->dir)
+        ;
+    return a->valor;
+}
+//versao recursiva
+int maiorABRec(ABin a) {
+    return a->dir ? maiorABRec(a->dir) : a->valor;
+}
+
+void removeMaiorA(ABin *a) {
+    for (; *a && (*a)->dir; a = &(*a)->dir)
+        ;
+    if (*a == NULL) return;
+    *a = (*a)->esq ? (*a)->esq : NULL;
+}
+//versao recursiva
+void removeMaiorARec(ABin *a) {
+    if (!*a) return;
+    if ((*a)->dir)
+        removeMaiorARec(&(*a)->dir);
+    else
+        *a = (*a)->esq ? (*a)->esq : NULL;
+}
+
+int quantosMaiores(ABin a, int x) {
+    if (a == NULL) return 0;
+    return (a->valor > x) + quantosMaiores(a->dir, x) + quantosMaiores(a->esq, x);
+}
+
+void listToBTree(LInt l, ABin *a) {
+    for (; l; l = l->prox)
+        addOrd(a, l->valor);
+}
+int sao_menores(ABin a, int x) {
+    if (a == NULL) return 1;
+    return a->valor < x && sao_menores(a->dir, x) && sao_menores(a->esq, x);
+}
+int sao_maiores(ABin a, int x) {
+    if (a == NULL) return 1;
+    return a->valor > x && sao_maiores(a->dir, x) && sao_maiores(a->esq, x);
+}
+int deProcura(ABin a) {
+    if (a == NULL) return 1;
+    return (a->esq == NULL || (a->esq->valor <= a->valor)) &&
+           (a->dir == NULL || (a->dir->valor >= a->valor)) &&
+           deProcura(a->esq) && deProcura(a->dir) &&
+           sao_maiores(a->dir,a->valor) &&  sao_menores(a->esq,a->valor);
 }
