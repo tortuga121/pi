@@ -1,3 +1,2 @@
-# 101 Perguntas de Programação Imperativa C
-## 1º Ano 2º Semestre
+# 100 C Questions
 26 - 06 - 2020
